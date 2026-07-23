@@ -45,6 +45,7 @@ hello-agents-learning/
 │   ├── section15/        # 15. 综合项目实战 (智能代码解释器 / 研报助手)
 │   └── section16/        # 16. 前沿探索与生态演进 (MCP / Agentic Workflow)
 ├── docs/                 # 学习笔记与章节内容
+├── images/               # 图片资源
 ├── .env.example          # 环境变量配置模板
 ├── .gitignore            # Git 忽略规则
 ├── requirements.txt      # 全局通用依赖清单
@@ -114,14 +115,6 @@ ZHIPUAI_API_KEY=your_zhipu_api_key
 | **工具与部署**      | FastAPI, Streamlit (可选 UI 展示)  |
 
 ---
-
-## 📖 学习日志
-
-| 日期       | 模块       | 学习内容 / 产出                    |   状态    |
-| :--------- | :--------- | :--------------------------------- | :-------: |
-| 2026-07-23 | 项目初始化 | 创建仓库与架构规划 README.md       |  已完成   |
-| -          | section01  | Agent 基础与 Prompt 工程实践       | 🔲 计划中 |
-| -          | section02  | ReAct 模式原理与纯 Python 手写实现 | 🔲 计划中 |
 
 > [!TIP]
 > 建议在学习过程中同步在 `docs/` 目录下记录思考与踩坑经验。
