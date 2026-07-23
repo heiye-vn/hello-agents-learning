@@ -1,0 +1,119 @@
+# ==========================================
+# 环境变量、密钥与敏感文件
+# ==========================================
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p12
+
+# ==========================================
+# Python 字节码、编译与缓存
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ==========================================
+# 虚拟环境 (Virtual Environments)
+# ==========================================
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+conda-env/
+
+# ==========================================
+# Agent / 大模型向量库与持久化数据存储
+# ==========================================
+.chroma/
+chroma_db/
+faiss_index/
+milvus_data/
+qdrant_storage/
+*.sqlite3
+*.db
+data/cache/
+data/raw/
+outputs/
+output/
+logs/
+*.log
+
+# ==========================================
+# 测试与代码质量工具缓存 (Testing & Linting)
+# ==========================================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
+
+# ==========================================
+# Jupyter Notebook 缓存
+# ==========================================
+.ipynb_checkpoints
+*-checkpoint.ipynb
+
+# ==========================================
+# IDE & 编辑器临时配置文件
+# ==========================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# 操作系统生成文件
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==========================================
+# 临时文件与打压包
+# ==========================================
+tmp/
+temp/
+*.tmp
+*.bak
+*.tar.gz
+*.zip
