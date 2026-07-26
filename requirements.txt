@@ -5,9 +5,18 @@ openai>=1.0.0
 pydantic>=2.0.0
 python-dotenv>=1.0.0
 
-# 基础数据处理与请求
+# 基础数据处理与网络请求
 requests>=2.31.0
 httpx>=0.25.0
 
-# 向量存储与 RAG（可选）
+# 搜索与外部扩展工具
+tavily-python>=0.3.0
+
+# 向量存储与 RAG（常用库）
 # chromadb>=0.4.0
+# faiss-cpu>=1.7.4
+
+# Web 服务与界面部署 (Section 14)
+# fastapi>=0.100.0
+# uvicorn>=0.22.0
+# streamlit>=1.25.0
