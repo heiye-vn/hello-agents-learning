@@ -1,7 +1,7 @@
 """ReAct 智能体实现"""
 
 from llm_client import HelloAgentsLLM
-from tools import ToolExecutor, search
+from tools import ToolExecutor, search, current_time
 import re
 
 # 设计系统提示词模板
@@ -11,13 +11,12 @@ REACT_PROMPT_TEMPLATE = """
 可用工具如下：
 {tools}
 
-请严格按照以下格式进行回应:
+请严格按照以下格式进行回应，每轮回答必须同时包含 Thought 和 Action 两个字段:
 
 Thought: 你的思考过程，用于分析问题、拆解任务和规划下一步行动。
 Action: 你决定采取的行动，必须是以下格式之一:
-- `{{tool_name}}[{{tool_input}}]`:调用一个可用工具。
-- `Finish[最终答案]`:当你认为已经获得最终答案时。
-- 当你收集到足够的信息，能够回答用户的最终问题时，你必须在Action:字段后使用 Finish[最终答案] 来输出最终答案。
+- `{{tool_name}}[{{tool_input}}]`: 调用一个可用工具。
+- `Finish[最终答案]`: 当你收集到足够的信息，能够回答用户的最终问题时，必须输出此命令。
 
 现在，请开始解决以下问题：
 Question: {question}
@@ -75,19 +74,25 @@ class ReActAgent:
                 print(f"🤔 思考: {thought}")
 
             if not action:
-                print("警告:未能解析出有效的Action, 流程终止。")
-                break
+                # 兜底逻辑：如果 LLM 没有严格输出 Action 字段，但输出了最终文本，直接作为最终答案输出
+                fallback_answer = response_text.strip()
+                if thought and len(thought) > 0:
+                    # 如果能解析出 Thought，且没有 Action，将思考/正文内容作为最终回答
+                    fallback_answer = thought
+                print(f"🎉 最终答案 (未严格遵循 Action 格式): {fallback_answer}")
+                return fallback_answer
 
             # 4. 执行 Action
             if action.startswith("Finish"):
-                # 如果是Finish指令，提取最终答案并结束
-                final_answer = re.match(r"Finish\[(.*)\]", action).group(1)
+                # 如果是Finish指令，提取最终答案并结束（使用 re.DOTALL 兼容多行答案）
+                match = re.match(r"Finish\[(.*)\]", action, re.DOTALL)
+                final_answer = match.group(1) if match else action
                 print(f"🎉 最终答案: {final_answer}")
                 return final_answer
 
             tool_name, tool_input = self._parse_action(action)
-            if not tool_name or not tool_input:
-                # ... 处理无效Action格式 ...
+            if tool_name is None or tool_input is None:
+                self.history.append("Observation: 无效的Action格式，请检查。")
                 continue
 
             print(f"🎬 行动: {tool_name}[{tool_input}]")
@@ -96,7 +101,10 @@ class ReActAgent:
             if not tool_function:
                 observation = f"错误:未找到名为 '{tool_name}' 的工具。"
             else:
-                observation = tool_function(tool_input)  # 调用真实工具
+                # 如果 tool_input 为空字符串，支持无参调用
+                observation = (
+                    tool_function(tool_input) if tool_input else tool_function()
+                )
 
             print(f"👀 观察: {observation}")
 
@@ -104,8 +112,8 @@ class ReActAgent:
             self.history.append(f"Action: {action}")
             self.history.append(f"Observation: {observation}")
 
-        # 循环结束
-        print("已达到最大步数，流程终止。")
+        # 循环结束（真正达到最大步数才执行）
+        print(f"已达到最大步数 ({self.max_steps} 步)，流程终止。")
         return None
 
     def _parse_output(self, text: str):
@@ -131,6 +139,7 @@ if __name__ == "__main__":
     tool_executor = ToolExecutor()
     search_desc = "一个网页搜索引擎。当你需要回答关于时事、事实以及在你的知识库中找不到的信息时，应使用此工具。"
     tool_executor.registerTool("Search", search_desc, search)
+    tool_executor.registerTool("Current_Time", "获取当前时间的工具", current_time)
     agent = ReActAgent(llm_client=llm, tool_executor=tool_executor)
-    question = "华为最新的手机是哪一款？它的主要卖点是什么？"
+    question = "截止到当前时间，华为最新的手机是哪一款？它的主要卖点是什么？"
     agent.run(question)
