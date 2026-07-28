@@ -37,8 +37,19 @@ class HelloAgentsLLM:
 
         self.client = OpenAI(api_key=apiKey, base_url=baseUrl, timeout=self.timeout)
 
-    def think(self, messages: List[Dict[str, str]], temperature: float = 0) -> str:
-        """调用大语言模型进行思考，并返回其响应。"""
+    def think(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: float = 0,
+        show_reasoning: bool = False,
+    ) -> str:
+        """调用大语言模型进行思考，并返回其响应。
+
+        参数:
+        - messages: 消息列表
+        - temperature: 采样温度
+        - show_reasoning: 是否输出DeepSeek/R1等模型的深度思考过程 (reasoning_content)
+        """
         print(f"🧠 正在调用 {self.model} 模型...")
         try:
             response = self.client.chat.completions.create(
@@ -52,23 +63,25 @@ class HelloAgentsLLM:
             print("✅ 大语言模型响应成功:")
             collected_content = []
             reasoning_started = False
+
             for chunk in response:
                 if not chunk.choices:
                     continue
                 delta = chunk.choices[0].delta
 
                 # 支持 DeepSeek / R1 等模型的深度思考/推理过程 (reasoning_content)
-                reasoning = getattr(delta, "reasoning_content", None)
-                if reasoning:
-                    if not reasoning_started:
-                        print("💭 [思考过程]: ", end="", flush=True)
-                        reasoning_started = True
-                    print(reasoning, end="", flush=True)
+                if show_reasoning:
+                    reasoning = getattr(delta, "reasoning_content", None)
+                    if reasoning:
+                        if not reasoning_started:
+                            print("💭 [思考过程]: ", end="", flush=True)
+                            reasoning_started = True
+                        print(reasoning, end="", flush=True)
 
                 # 处理模型正文回答 (content)
                 content = delta.content or ""
                 if content:
-                    if reasoning_started:
+                    if show_reasoning and reasoning_started:
                         print("\n\n💬 [回答]: ", end="", flush=True)
                         reasoning_started = False
                     print(content, end="", flush=True)
@@ -91,6 +104,12 @@ class HelloAgentsLLM:
                 "3. 【API服务开销】：第三方 API 节点可能存在短时间断流，可再次运行或更换 Base URL。"
             )
             return None
+
+    def think_with_reasoning(
+        self, messages: List[Dict[str, str]], temperature: float = 0
+    ) -> str:
+        """显式打印思考过程 (reasoning_content) 的调用方法。"""
+        return self.think(messages, temperature=temperature, show_reasoning=True)
 
 
 # ===================== 添加主程序，验证 LLM 客户端 =====================

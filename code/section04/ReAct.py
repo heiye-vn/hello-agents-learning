@@ -1,4 +1,4 @@
-"""ReAct 智能体实现"""
+"""智能体范式 —— ReAct【思考(Thought) → 行动(Action) → 观察(Observation)】"""
 
 from llm_client import HelloAgentsLLM
 from tools import ToolExecutor, search, current_time
@@ -84,11 +84,20 @@ class ReActAgent:
 
             # 4. 执行 Action
             if action.startswith("Finish"):
-                # 如果是Finish指令，提取最终答案并结束（使用 re.DOTALL 兼容多行答案）
-                match = re.match(r"Finish\[(.*)\]", action, re.DOTALL)
-                final_answer = match.group(1) if match else action
-                print(f"🎉 最终答案: {final_answer}")
-                return final_answer
+                # 优先使用 re.search + 贪婪匹配 (.*)，配合 re.DOTALL 兼容跨行文本
+                match = re.search(r"Finish\[(.*)\]", action, re.DOTALL)
+                if match:
+                    final_answer = match.group(1).strip()
+                    print(f"🎉 最终答案: {final_answer}")
+                    return final_answer
+                else:
+                    # 容错兜底：若 LLM 忘记写末尾的 ']'，使用切片强行提取
+                    print(
+                        f"⚠️ 警告：Finish 正则未匹配成功，触发兜底提取。原始内容: {action}"
+                    )
+                    final_answer = action[7:].rstrip("]").strip()
+                    print(f"🎉 最终答案(兜底): {final_answer}")
+                    return final_answer
 
             tool_name, tool_input = self._parse_action(action)
             if tool_name is None or tool_input is None:
