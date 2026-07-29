@@ -1,12 +1,13 @@
-from colorama import Fore
-from camel.societies import RolePlaying
-from camel.utils import print_text_animated
-from camel.models import ModelFactory
-from camel.types import ModelPlatformType
-from dotenv import load_dotenv
-import sys
 import os
+import sys
 from pathlib import Path
+
+from camel.models import ModelFactory
+from camel.societies import RolePlaying
+from camel.types import ModelPlatformType
+from camel.utils import print_text_animated
+from colorama import Fore
+from dotenv import load_dotenv
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")

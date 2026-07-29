@@ -19,4 +19,9 @@ tavily-python>=0.3.0
 # Web 服务与界面部署 (Section 14)
 # fastapi>=0.100.0
 # uvicorn>=0.22.0
-# streamlit>=1.25.0
+# streamlit>=1.25.0
+
+tavily
+langchain-core
+langchain-openai
+langgraph

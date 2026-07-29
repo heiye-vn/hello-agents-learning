@@ -6,16 +6,18 @@
 """
 
 import asyncio
+import os
+from pathlib import Path
 from typing import TypedDict, Annotated
+
+
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_openai import ChatOpenAI
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
-from langgraph.checkpoint.memory import InMemorySaver
-import os
-from dotenv import load_dotenv
-from pathlib import Path
 from tavily import TavilyClient
+from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).parent / ".env")
 
@@ -276,8 +278,8 @@ async def main():
 
 
 if __name__ == "__main__":
-    # asyncio.run(main())
+    asyncio.run(main())
 
     # 获取并打印 Mermaid 语法文本
-    mermaid_code = get_workflow_mermaid()
-    print(mermaid_code)
+    # mermaid_code = get_workflow_mermaid()
+    # print(mermaid_code)
