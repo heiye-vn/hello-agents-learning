@@ -61,13 +61,22 @@ hello-agents-learning/
 确保已安装 Python 3.10 或更高版本。建议使用 `venv` 或 `conda` 创建隔离虚拟环境：
 
 ```bash
-# 创建并激活虚拟环境 (Windows PowerShell)
+# 创建并激活虚拟环境 (Windows PowerShell)【venv、.venv，推荐.venv】
 python -m venv venv
 .\venv\Scripts\Activate.ps1
+
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 
 # Linux / macOS
 python3 -m venv venv
 source venv/bin/activate
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 退出虚拟环境
+deactivate
 ```
 
 ### 2. 安装依赖
