@@ -73,10 +73,18 @@ class MyReActAgent(ReActAgent):
 
             # 2. 调用LLM
             messages = [{"role": "user", "content": prompt}]
-            response_text = self.llm.invoke(messages, **kwargs)
+            response = self.llm.invoke(messages, **kwargs)
+            response_text = (
+                response.content if hasattr(response, "content") else str(response)
+            )
 
             # 3. 解析输出
             thought, action = self._parse_output(response_text)
+
+            if thought:
+                print(f"🤔 Thought: {thought}")
+            if action:
+                print(f"🎬 Action: {action}")
 
             # 4. 检查完成条件
             if action and action.startswith("Finish"):
@@ -88,12 +96,38 @@ class MyReActAgent(ReActAgent):
             # 5. 执行工具调用
             if action:
                 tool_name, tool_input = self._parse_action(action)
-                observation = self.tool_registry.execute_tool(tool_name, tool_input)
-                self.current_history.append(f"Action: {action}")
-                self.current_history.append(f"Observation: {observation}")
+                if tool_name and tool_input is not None:
+                    observation = self.tool_registry.execute_tool(tool_name, tool_input)
+                    print(f"👀 Observation: {observation}")
+                    self.current_history.append(f"Action: {action}")
+                    self.current_history.append(f"Observation: {observation}")
+                else:
+                    print(f"⚠️ 无法解析 Action 格式: {action}")
 
         # 达到最大步数
         final_answer = "抱歉，我无法在限定步数内完成这个任务。"
         self.add_message(Message(input_text, "user"))
         self.add_message(Message(final_answer, "assistant"))
         return final_answer
+
+    def _parse_output(self, text: str) -> Tuple[Optional[str], Optional[str]]:
+        """解析 LLM 的输出，提取 Thought 和 Action"""
+        thought_match = re.search(r"Thought:\s*(.*?)(?=\nAction:|$)", text, re.DOTALL)
+        action_match = re.search(r"Action:\s*(.*?)$", text, re.DOTALL)
+        thought = thought_match.group(1).strip() if thought_match else None
+        action = action_match.group(1).strip() if action_match else None
+        return thought, action
+
+    def _parse_action_input(self, action_text: str) -> str:
+        """提取 Finish[内容] 中的答案"""
+        match = re.search(r"Finish\[(.*)\]", action_text, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+        return action_text.replace("Finish", "").strip("[] ")
+
+    def _parse_action(self, action_text: str) -> Tuple[Optional[str], Optional[str]]:
+        """解析 Action 字符串，提取工具名称和参数"""
+        match = re.match(r"(\w+)\[(.*)\]", action_text, re.DOTALL)
+        if match:
+            return match.group(1), match.group(2)
+        return None, None
