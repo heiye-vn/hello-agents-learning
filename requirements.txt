@@ -1,4 +1,5 @@
-# Agent 学习项目基础依赖包
+# Agent 学习项目基础框架
+hello-agents[all]==0.2.0
 
 # LLM 与 SDK
 openai>=1.0.0
@@ -16,7 +17,8 @@ tavily-python>=0.3.0
 # chromadb>=0.4.0
 # faiss-cpu>=1.7.4
 
-# Web 服务与界面部署 (Section 14)
+# Web 服务与界面部署 (Section 08 & Section 14)
+gradio
 # fastapi>=0.100.0
 # uvicorn>=0.22.0
 # streamlit>=1.25.0
