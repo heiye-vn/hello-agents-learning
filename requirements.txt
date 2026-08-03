@@ -1,5 +1,5 @@
-# Agent 学习项目基础框架
-hello-agents[all]==0.2.0
+# Agent 学习项目基础框架（版本递增）
+hello-agents[all]==0.2.2
 
 # LLM 与 SDK
 openai>=1.0.0
